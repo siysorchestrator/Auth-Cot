@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Autorizar Cotización</title>
+</head>
+
+<body>
+    <h2>¿Autorizas la cotización?</h2>
+
+    <button onclick="sendResponse(true)">Yes</button>
+    <button onclick="sendResponse(false)">No</button>
+
+    <script>
+        const query = new URLSearchParams(window.location.search);
+        const clientId = query.get("clientId");
+        const itemId = query.get("itemId");
+
+        async function sendResponse(accepted) {
+            const webhookUrl = accepted
+                ? "https://n8n.siysmedicalmx.com/webhook-test/auth-cot"
+                : "https://n8n.siysmedicalmx.com/webhook-test/deny-cot";
+
+            const body = {
+                clientId,
+                itemId,
+                accepted
+            };
+
+            try {
+                const res = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+
+                if (res.ok) {
+                    alert("Response submitted.");
+                } else {
+                    alert("Error submitting response.");
+                }
+            } catch (err) {
+                alert("Network error.");
+            }
+        }
+    </script>
+</body>
+
+</html>
