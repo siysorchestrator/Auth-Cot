@@ -44,7 +44,6 @@
                 });
 
                 const result = await checkResponse.json();
-                window.alert("Webhook response:", result);
 
                 if (result.proceed === true) {
                     // Redirect after webhook is sent
