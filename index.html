@@ -32,20 +32,22 @@
                 return;
             }
 
-            const webhookUrl = accepted
-                ? "https://n8n.siysmedicalmx.com/webhook/auth-cot"
-                : "https://n8n.siysmedicalmx.com/webhook/deny-cot";
-
             const body = { clientId, itemId, accepted };
 
             try {
-                const res = await fetch(webhookUrl, {
+                const res = await fetch("https://n8n.siysmedicalmx.com/webhook/check-cot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(body)
                 });
 
-                window.location.href = "answer.html";
+                const result = await res.json();
+
+                if (result.redirect) {
+                    window.location.href = result.redirect;
+                } else {
+                    alert("No redirect provided by server.");
+                }
             } catch (err) {
                 alert("Network error.");
             }
