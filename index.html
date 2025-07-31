@@ -24,45 +24,55 @@
         const query = new URLSearchParams(window.location.search);
         const clientId = query.get("clientId");
         const itemId = query.get("itemId");
-        const accepted = query.get("accepted");
+        const accepted = query.get("accepted") === "true";
 
-        async function sendResponse() {
-            if (!clientId || !itemId || accepted === null) {
+        async function checkBeforeRedirect() {
+            if (!clientId || !itemId || query.get("accepted") === null) {
                 alert("Faltan parámetros en la URL.");
                 return;
             }
 
+            const checkUrl = "https://n8n.siysmedicalmx.com/webhook-test/check-cot";
+
             try {
-                const response = await fetch("https://n8n.siysmedicalmx.com/webhook-test/check-cot", {
+                const checkResponse = await fetch(checkUrl, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({
-                        clientId: clientId,
-                        itemId: itemId,
-                        accepted: accepted === "true"
-                    })
+                    body: JSON.stringify({ clientId, itemId, accepted })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                const result = await checkResponse.json();
 
-                const data = await response.json();
+                if (result.proceed === true) {
+                    // Proceed with sending to the appropriate webhook
+                    const webhookUrl = accepted
+                        ? "https://n8n.siysmedicalmx.com/webhook/auth-cot"
+                        : "https://n8n.siysmedicalmx.com/webhook/deny-cot";
 
-                if (data.redirect) {
-                    window.location.href = data.redirect;
+                    await fetch(webhookUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ clientId, itemId, accepted })
+                    });
+
+                    // Redirect after webhook is sent
+                    window.location.href = "answer.html";
                 } else {
-                    alert("No se recibió una redirección válida.");
+                    // Redirect to rejection page
+                    window.location.href = "denied.html"; // create this page or change the URL
                 }
+
             } catch (error) {
-                console.error("Error:", error);
-                alert("Error de red o del servidor.");
+                alert("Ocurrió un error de red. Verifica tu conexión o contacta soporte.");
+                console.error(error);
             }
         }
 
-        sendResponse();
+        checkBeforeRedirect();
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
