@@ -47,19 +47,6 @@
                 window.alert("Webhook response:", result);
 
                 if (result.proceed === true) {
-                    // Proceed with sending to the appropriate webhook
-                    const webhookUrl = accepted
-                        ? "https://n8n.siysmedicalmx.com/webhook/auth-cot"
-                        : "https://n8n.siysmedicalmx.com/webhook/deny-cot";
-
-                    await fetch(webhookUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ clientId, itemId, accepted })
-                    });
-
                     // Redirect after webhook is sent
                     window.location.href = "answer.html";
                 } else {
