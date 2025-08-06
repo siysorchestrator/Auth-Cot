@@ -104,6 +104,7 @@
             const base64Data = signaturePad.toDataURL();
             const params = new URLSearchParams(window.location.search);
             const itemId = params.get('item_id');
+            const columnId = params.get('column_id');
 
             if (!itemId) {
                 alert("Missing data.");
@@ -112,6 +113,7 @@
 
             const payload = {
                 item_id: itemId,
+                column_id: columnId,
                 signature: base64Data,
             };
 
