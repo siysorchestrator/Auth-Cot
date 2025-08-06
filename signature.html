@@ -127,7 +127,7 @@
                 });
 
                 if (response.ok) {
-                    document.getElementById("status").innerText = "Signature submitted successfully!";
+                    window.location.href = "submitted.html";
                 } else {
                     document.getElementById("status").innerText = "Error submitting signature.";
                 }
